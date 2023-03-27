@@ -1,0 +1,12 @@
+[submodule "dependencies/pugixml"]
+	path = dependencies/pugixml
+	url = https://github.com/zeux/pugixml.git
+[submodule "dependencies/fmt"]
+	path = dependencies/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "dependencies/spdlog"]
+	path = dependencies/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "dependencies/SDL"]
+	path = dependencies/SDL
+	url = https://github.com/libsdl-org/SDL.git
