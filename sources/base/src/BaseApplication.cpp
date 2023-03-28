@@ -330,7 +330,7 @@ int BaseApplication::configure(int argc, char ** argv)
         {
             std::ostringstream ss;
             configXml.save(ss, "  ");
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Config loaded:\n%s", ss.str().data());
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Config loaded:\n%s", ss.str().data());
         }
     }
 

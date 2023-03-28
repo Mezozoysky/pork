@@ -1,9 +1,9 @@
 set(HEADER_FILES
     StrUtils.hpp
     Exception.hpp
-    TypeInfo.hpp
-    Service.hpp
-    Context.hpp
+    # TypeInfo.hpp
+    # Service.hpp
+    # Context.hpp
     Logging.hpp
     BaseApplication.hpp
     )
@@ -11,9 +11,9 @@ set(HEADER_FILES
 set(SOURCE_FILES
     StrUtils.cpp
     Exception.cpp
-    TypeInfo.cpp
-    Service.cpp
-    Context.cpp
+    # TypeInfo.cpp
+    # Service.cpp
+    # Context.cpp
     Logging.cpp
     BaseApplication.cpp
     )

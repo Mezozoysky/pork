@@ -13,7 +13,8 @@ using Logger = std::shared_ptr<spdlog::logger>;
 using Sink = spdlog::sink_ptr;
 
 class Logging
-: public Service<Logging>
+//: public Service<Logging>
+: public AbstractService
 {
 public:
 	Logging() noexcept = default;

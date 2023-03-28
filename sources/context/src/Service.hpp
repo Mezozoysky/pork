@@ -22,22 +22,23 @@ public:
     AbstractService & operator=(AbstractService && other) = default;
 };
 
-template<typename ServiceT>
-class Service
-: public AbstractService
-{
-public:
-    using Ptr = std::unique_ptr<ServiceT>;
+//template<typename ServiceT>
+//class Service
+//: public AbstractService
+//{
+//public:
+//    using Ptr = std::unique_ptr<ServiceT>;
 
-    Service() noexcept = default;
-    virtual ~Service() noexcept = default;
-};
+//    Service() noexcept = default;
+//    virtual ~Service() noexcept = default;
+//};
 
 
 template<typename ServiceT, typename... ArgsT>
 inline typename ServiceT::Ptr AbstractService::make(ArgsT... args)
 {
-    static_assert(std::is_base_of<Service<ServiceT>, ServiceT>::value, "TheService must be derived from Service<TheService>");
+//    static_assert(std::is_base_of<Service<ServiceT>, ServiceT>::value, "TheService must be derived from Service<TheService>");
+    static_assert(std::is_base_of<AbstractService, ServiceT>::value, "TheService must be derived from AbstractService");
     return std::make_unique<ServiceT>(std::forward<ArgsT>(args)...);
 }
 
