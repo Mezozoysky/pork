@@ -1,16 +1,16 @@
 #include <Context.hpp>
-#include <BaseApplication.hpp>
+#include <Application.hpp>
 #include <string_view>
 
 using namespace std::literals;
 
 
-class Application
-: public pork::base::BaseApplication
+class App
+: public pork::base::Application
 {
 public:
-    Application();
-    virtual ~Application();
+    App();
+    virtual ~App();
 
     int onConfigure(std::vector<std::string_view> const & args, pugi::xml_document const & configXml) override;
     int onSetUp() override;

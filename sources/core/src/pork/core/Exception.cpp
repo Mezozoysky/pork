@@ -1,7 +1,7 @@
 #include "Exception.hpp"
 
 
-namespace pork::base
+namespace pork::core
 {
 
 Exception::Exception(char const * message, int code)
@@ -9,4 +9,4 @@ Exception::Exception(char const * message, int code)
 , mCode{code}
 {}
 
-} // namespace pork::base
+} // namespace pork::core

@@ -7,7 +7,7 @@
 #include <limits>
 
 
-namespace pork::base
+namespace pork::core
 {
 
 using StrList = std::vector<std::string>;
@@ -79,4 +79,4 @@ bool parseNumber(std::string const & str, T & value)
     return false;
 }
 
-} // namspace pork::base
+} // namspace pork::core

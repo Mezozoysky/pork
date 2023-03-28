@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 
-namespace pork::base
+namespace pork::core
 {
 
 class Exception
@@ -23,4 +23,4 @@ private:
 };
 
 
-} // namespace pork::base
+} // namespace pork::core

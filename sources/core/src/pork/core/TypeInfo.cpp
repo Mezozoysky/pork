@@ -1,6 +1,6 @@
 #include "TypeInfo.hpp"
 
-namespace pork::base
+namespace pork::core
 {
 
 TypeInfo::TypeInfo() noexcept
@@ -16,4 +16,4 @@ TypeInfo::TypeInfo(std::type_index index, TypeInfo const * const baseInfo, char 
 {}
 
 
-} // namespace pork::base
+} // namespace pork::core

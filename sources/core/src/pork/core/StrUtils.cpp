@@ -6,7 +6,7 @@
 
 using namespace std::literals;
 
-namespace pork::base
+namespace pork::core
 {
 
 constexpr char const * WHITESPACE{" \n\t\v\r\f"};
@@ -135,4 +135,4 @@ bool parseBool(std::string const & str, bool & value, std::string_view t, std::s
     return false;
 }
 
-} // namspace pork::base
+} // namspace pork::core

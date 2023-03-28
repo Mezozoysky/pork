@@ -1,72 +1,104 @@
 #pragma once
 
-#include <SFML/Graphics/RenderWindow.hpp>
+#include <Context.hpp>
+#include <vector>
+#include <string>
+#include <string_view>
+#include <optional>
+#include <filesystem>
 
+namespace pugi
+{
+class xml_document;
+}
 
-namespace sfmk::base
+namespace pork::base
 {
 
-class AbstractApplication
+class Application
 {
 public:
-    AbstractApplication() noexcept;
-    virtual ~AbstractApplication() noexcept = default;
+    Application(std::string_view appName, std::optional<std::string_view> orgName = std::nullopt);
+    virtual ~Application() noexcept = default;
+    Application(Application const & other) = delete;
+    Application & operator=(Application const & other) = delete;
 
-    AbstractApplication(AbstractApplication const&) = delete;
-    AbstractApplication const& operator=(AbstractApplication const&) = delete;
+    int run(int argc, char ** argv);
+    void stop();
+    bool isStopping() const noexcept;
 
-    int run();
-    inline void stop() noexcept
-    {
-        mIsRunning = false;
-        onStop();
-    }
-    inline bool isRunning() const noexcept
-    {
-        return mIsRunning;
-    }
+    std::string_view getAppName() const noexcept;
+    std::optional<std::string_view> getOrgName() const noexcept;
+    std::optional<std::filesystem::path> getBasePath() const noexcept;
+    std::optional<std::filesystem::path> getPrefPath() const noexcept;
+
+    Context & context() noexcept;
 
 protected:
-    virtual void onInitialize() = 0;
-    virtual void onConfigure() = 0;
-    virtual void onStart() = 0;
-    virtual void onStop() = 0;
-    virtual void onStoped() = 0;
-    virtual void onUninitialize() = 0;
+    virtual int onConfigure(std::vector<std::string_view> const & args, pugi::xml_document const & configXml) = 0;
+    virtual int onSetUp() = 0;
+    virtual int onStart() = 0;
+    virtual void onShutDown() = 0;
+
+    virtual void iterate() = 0;
+
+    virtual std::optional<std::filesystem::path> findConfig();
 
 private:
-    void initialize();
-    void configure();
-    void uninitialize();
-    int loop();
+    int configure(int argc, char ** argv);
+    int setUp();
+    int start();
+    void shutDown();
 
 private:
-    bool mIsInitialized;
-    bool mIsRunning;
+    void findBasePath();
+    void findPrefPath();
 
-    sf::RenderWindow mWindow;
+    bool mStopping;
+
+    std::string mAppName;
+    std::optional<std::string> mOrgName;
+
+    std::optional<std::filesystem::path> mBasePath;
+    std::optional<std::filesystem::path> mPrefPath;
+    std::optional<std::filesystem::path> mConfigFilePath;
+
+    Context mContext;
 };
 
-
-template<typename ContextT>
-class BasicApplication
-: public AbstractApplication
+inline void Application::stop()
 {
-public:
-    using ContextType = ContextT;
-public:
-    BasicApplication()
-    : AbstractApplication()
-    {}
-    virtual ~BasicApplication() = default;
+    mStopping = true;
+}
 
-    inline ContextType * const context() const noexcept
-    {
-        return &mContext;
-    }
-private:
-    ContextType mContext;
-};
+inline bool Application::isStopping() const noexcept
+{
+    return mStopping;
+}
 
+inline std::optional<std::string_view> Application::getOrgName() const noexcept
+{
+    return mOrgName;
+}
 
-} // namespace sfmk::base
+inline std::string_view Application::getAppName() const noexcept
+{
+    return mAppName;
+}
+
+inline std::optional<std::filesystem::path> Application::getBasePath() const noexcept
+{
+    return mBasePath;
+}
+
+inline std::optional<std::filesystem::path> Application::getPrefPath() const noexcept
+{
+    return mPrefPath;
+}
+
+inline Context & Application::context() noexcept
+{
+    return mContext;
+}
+
+} // namespace pork::base

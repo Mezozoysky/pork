@@ -14,9 +14,7 @@ set_target_properties(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
-    pork::context
-    spdlog::spdlog
-    fmt::fmt
+    pork::core
     pugixml::static
     SDL3::SDL3-static
     )
@@ -24,9 +22,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    $<TARGET_PROPERTY:pork::context,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:fmt::fmt,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:spdlog::spdlog,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:pork::core,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:pugixml::static,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:SDL3::SDL3-static,INTERFACE_INCLUDE_DIRECTORIES>
     )

@@ -1,3 +1,3 @@
-add_subdirectory(context)
+add_subdirectory(core)
 add_subdirectory(base)
 add_subdirectory(demo)

@@ -1,21 +1,13 @@
 set(HEADER_FILES
-    StrUtils.hpp
-    Exception.hpp
-    # TypeInfo.hpp
-    # Service.hpp
-    # Context.hpp
-    Logging.hpp
-    BaseApplication.hpp
+    Service.hpp
+    Context.hpp
+    Application.hpp
     )
 
 set(SOURCE_FILES
-    StrUtils.cpp
-    Exception.cpp
-    # TypeInfo.cpp
-    # Service.cpp
-    # Context.cpp
-    Logging.cpp
-    BaseApplication.cpp
+    Service.cpp
+    Context.cpp
+    Application.cpp
     )
 
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}"

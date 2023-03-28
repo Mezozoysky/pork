@@ -1,30 +1,33 @@
 #include "App.hpp"
+#include <pork/core/Logging.hpp>
 
 
-Application::Application()
-: pork::base::BaseApplication("PorkDemo"sv, "PorkDynamics"sv)
+App::App()
+: pork::base::Application("PorkDemo"sv, "PorkDynamics"sv)
 {}
 
-Application::~Application()
+App::~App()
 {}
 
-int Application::onConfigure(std::vector<std::string_view> const & args, pugi::xml_document const & configXml)
-{
-        return 0;
-}
-
-int Application::onSetUp()
+int App::onConfigure(std::vector<std::string_view> const & args, pugi::xml_document const & configXml)
 {
     return 0;
 }
-int Application::onStart()
+
+int App::onSetUp()
 {
     return 0;
 }
-void Application::onShutDown()
+
+int App::onStart()
+{
+    return 0;
+}
+
+void App::onShutDown()
 {}
 
-void Application::iterate()
+void App::iterate()
 {
     stop();
 }

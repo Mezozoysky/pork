@@ -1,11 +1,15 @@
 set(HEADER_FILES
-    Service.hpp
-    Context.hpp
+    pork/core/StrUtils.hpp
+    pork/core/Exception.hpp
+    # pork/core/TypeInfo.hpp
+    pork/core/Logging.hpp
     )
 
 set(SOURCE_FILES
-    Service.cpp
-    Context.cpp
+    pork/core/StrUtils.cpp
+    pork/core/Exception.cpp
+    # pork/core/TypeInfo.cpp
+    pork/core/Logging.cpp
     )
 
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}"

@@ -13,7 +13,7 @@ namespace pork::base
 
 class Context
 {
-   using TypeMap = std::unordered_map<std::type_index, AbstractService::Ptr>;
+    using TypeMap = std::unordered_map<std::type_index, AbstractService::Ptr>;
 
 public:
     Context() = default;
@@ -26,7 +26,7 @@ public:
         {
             throw std::runtime_error{std::string{"Failed to add service: "} + index.name() + " already exists"};
         }
-        return static_cast<ServiceT *>(addService(std::move(index), AbstractService::make<ServiceT>(std::forward<ArgsT>(args...)...)));
+        return static_cast<ServiceT *>(addService(std::move(index), ServiceT::makePtr(std::forward<ArgsT>(args...)...)));
     }
     template<typename ServiceT>
     ServiceT * addService(typename ServiceT::Ptr && ptr)
@@ -85,3 +85,4 @@ inline Context & Contextual::context() const
 }
 
 } // namspace pork::base
+

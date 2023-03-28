@@ -4,7 +4,7 @@
 #include <typeindex>
 #include <unordered_map>
 
-namespace pork::base
+namespace pork::core
 {
 
 class TypeInfo
@@ -87,4 +87,4 @@ private:
 template<typename DerivedT, typename BaseT, char const * const typeNameV>
 TypeInfo TypeInfoMixin<DerivedT, BaseT, typeNameV>::sTypeInfo{{typeid(DerivedT)}, BaseT::getTypeInfoStatic(), typeNameV};
 
-} // namespace pork::base
+} // namespace pork::core
