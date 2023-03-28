@@ -6,8 +6,8 @@
 # endif()
 
 if(PORK_SDL_BUNDLED)
-    set(SDL_SHARED OFF)
-    set(SDL_STATIC ON)
+  set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+  set(SDL_STATIC ON CACHE BOOL "" FORCE)
     add_subdirectory(SDL)
 else()
     find_package(SDL >=3.0.0 REQUIRED)
@@ -31,3 +31,4 @@ if(PORK_PUGIXML_BUNDLED)
 else()
     find_package(pugixml REQUIRED)
 endif()
+
