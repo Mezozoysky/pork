@@ -16,6 +16,8 @@ target_link_libraries(${PROJECT_NAME}
     INTERFACE
     spdlog::spdlog
     fmt::fmt
+    PUBLIC
+    pork::common
     )
 target_include_directories(${PROJECT_NAME}
     PUBLIC

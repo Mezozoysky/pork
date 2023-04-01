@@ -17,6 +17,8 @@ target_link_libraries(${PROJECT_NAME}
     pork::core
     pugixml::static
     SDL3::SDL3-static
+    PUBLIC
+    pork::common
     )
 target_include_directories(${PROJECT_NAME}
     PUBLIC
