@@ -1,6 +1,7 @@
 set(HEADER_FILES
     pork/core/StrUtils.hpp
     pork/core/Exception.hpp
+    pork/core/Errors.hpp
     # pork/core/TypeInfo.hpp
     pork/core/Logging.hpp
     )
@@ -8,6 +9,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
     pork/core/StrUtils.cpp
     pork/core/Exception.cpp
+    pork/core/Errors.cpp
     # pork/core/TypeInfo.cpp
     pork/core/Logging.cpp
     )
