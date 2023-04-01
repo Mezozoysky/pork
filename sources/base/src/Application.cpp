@@ -1,6 +1,6 @@
 #include "Application.hpp"
 #include <pork/core/StrUtils.hpp>
-#include <pork/core/Exception.hpp>
+#include <pork/core/Errors.hpp>
 #include <SFML/Config.hpp>
 #include <SFML/System/Err.hpp>
 #include <cassert>
@@ -18,9 +18,9 @@
 #include <pugixml.hpp>
 
 //#if defined(PORK_PLATFORM_LINUX)
-//#include <limits.h>
-//#include <libgen.h>
-//#include <unistd.h>
+////#include <limits.h>
+////#include <libgen.h>
+////#include <unistd.h>
 //#if defined(__sun)
 //#define SELF_EXECUTABLE "/proc/self/path/a.out"
 //#else
@@ -63,7 +63,8 @@ int Application::run(int argc, char ** argv)
         char * basePath = SDL_GetBasePath();
         if (basePath == NULL)
         {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to obtain application base path: %s", SDL_GetError());
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                         "Failed to obtain application base path: %s", SDL_GetError());
         }
         else
         {
@@ -72,10 +73,12 @@ int Application::run(int argc, char ** argv)
         }
 #endif
 
-        char * prefPath = SDL_GetPrefPath(mOrgName.has_value() ? mOrgName->data() : "", mAppName.data());
+        char * prefPath = SDL_GetPrefPath(mOrgName.has_value() ? mOrgName->data() : "",
+                                          mAppName.data());
         if (prefPath == NULL)
         {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to obtain application pref path: %s", SDL_GetError());
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                         "Failed to obtain application pref path: %s", SDL_GetError());
         }
         else
         {
@@ -98,7 +101,8 @@ int Application::run(int argc, char ** argv)
     }
     catch (std::system_error const & ex)
     {
-        auto errorMessage = fmt::format("Exception during configuring: {} (code: {})", ex.what(), ex.code().value());
+        auto errorMessage = fmt::format("Exception during configuring: {} (code: {})",
+                                        ex.what(), ex.code().value());
         if (logger)
         {
             logger->critical(errorMessage);
@@ -145,7 +149,8 @@ int Application::run(int argc, char ** argv)
     }
     catch (std::system_error const & ex)
     {
-        auto errorMessage = fmt::format("Unhandled exception: {} (code: {})", ex.what(), ex.code().value());
+        auto errorMessage = fmt::format("Unhandled exception: {} (code: {})",
+                                        ex.what(), ex.code().value());
         logger->critical(errorMessage);
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Critical error", errorMessage.data(), NULL);
         error = ex.code().value();
@@ -177,7 +182,8 @@ std::optional<fs::path> Application::findConfig()
         {
             configPath = cwd;
             configPath.append(configName);
-            if (fs::exists(configPath) and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
+            if (fs::exists(configPath)
+                and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
             {
                 return configPath;
             }
@@ -185,7 +191,8 @@ std::optional<fs::path> Application::findConfig()
     }
     catch (fs::filesystem_error const & ex)
     {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error while searching for config in current directory: %s", ex.what());
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                     "Error while searching for config in current directory: %s", ex.what());
     }
 
     // checking for config in base
@@ -195,14 +202,16 @@ std::optional<fs::path> Application::findConfig()
         {
             configPath = mBasePath.value();
             configPath.append(configName);
-            if (fs::exists(configPath) and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
+            if (fs::exists(configPath)
+                and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
             {
                 return configPath;
             }
         }
         catch (fs::filesystem_error const & ex)
         {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error while searching for config in base directory: %s", ex.what());
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                         "Error while searching for config in base directory: %s", ex.what());
         }
 
         // checking for base parent
@@ -213,7 +222,8 @@ std::optional<fs::path> Application::findConfig()
             {
                 configPath.append(configName);
 
-                if (fs::exists(configPath) and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
+                if (fs::exists(configPath)
+                    and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
                 {
                     return configPath;
                 }
@@ -221,7 +231,8 @@ std::optional<fs::path> Application::findConfig()
         }
         catch (fs::filesystem_error const & ex)
         {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error while searching for config in base parent directory: %s", ex.what());
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                         "Error while searching for config in base parent directory: %s", ex.what());
         }
     }
 
@@ -234,7 +245,8 @@ std::optional<fs::path> Application::findConfig()
             configPath = mPrefPath.value();
             configPath.append(configName);
 
-            if (fs::exists(configPath) and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
+            if (fs::exists(configPath)
+                and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
             {
                 return configPath;
             }
@@ -243,14 +255,16 @@ std::optional<fs::path> Application::findConfig()
             configPath = mPrefPath.value();
             configPath.append("config.xml");
 
-            if (fs::exists(configPath) and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
+            if (fs::exists(configPath)
+                and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
             {
                 return configPath;
             }
         }
         catch (fs::filesystem_error const & ex)
         {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error while searching for config in pref directory: %s", ex.what());
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                         "Error while searching for config in pref directory: %s", ex.what());
         }
     }
 
@@ -259,7 +273,9 @@ std::optional<fs::path> Application::findConfig()
     {
         try
         {
-            if (fs::is_directory(mBasePath.value()) and mBasePath.value().has_parent_path() and mBasePath.value().filename().string() == "bin")
+            if (fs::is_directory(mBasePath.value())
+                and mBasePath.value().has_parent_path()
+                and mBasePath.value().filename().string() == "bin")
             {
                 fs::path etcPath = mBasePath.value().parent_path();
                 etcPath.append("etc");
@@ -268,7 +284,8 @@ std::optional<fs::path> Application::findConfig()
                 configPath = etcPath;
                 configPath.append(configName);
 
-                if (fs::exists(configPath) and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
+                if (fs::exists(configPath)
+                    and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
                 {
                     return configPath;
                 }
@@ -278,7 +295,8 @@ std::optional<fs::path> Application::findConfig()
                 configPath.append(mAppName);
                 configPath.append("config.xml");
 
-                if (fs::exists(configPath) and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
+                if (fs::exists(configPath)
+                    and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
                 {
                     return configPath;
                 }
@@ -286,7 +304,8 @@ std::optional<fs::path> Application::findConfig()
         }
         catch (fs::filesystem_error const & ex)
         {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error while searching for config in etc/ directory: %s", ex.what());
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                         "Error while searching for config in etc/ directory: %s", ex.what());
         }
     }
 
@@ -327,7 +346,9 @@ int Application::configure(int argc, char ** argv)
         auto result = configXml.load_file(mConfigFilePath.value().native().c_str());
         if (result.status != pugi::xml_parse_status::status_ok)
         {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load config file '%s': %s", mConfigFilePath.value().native().data(), result.description());
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                         "Failed to load config file '%s': %s",
+                         mConfigFilePath.value().native().data(), result.description());
         }
         else
         {
@@ -352,7 +373,8 @@ int Application::configure(int argc, char ** argv)
         auto rootNode = configXml.child("config");
         if (rootNode.empty())
         {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Config is malformed: no root node with named 'config'");
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                         "Config is malformed: no root node with named 'config'");
         }
         else
         {
@@ -367,7 +389,9 @@ int Application::configure(int argc, char ** argv)
                     level = spdlog::level::from_str(levelStr);
                     if (level == spdlog::level::off && levelStr != "off")
                     {
-                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log config is malformed: unexpected level value: '%s'", levelStr.data());
+                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                                     "Log config is malformed: unexpected level value: '%s'",
+                                     levelStr.data());
                         level = spdlog::level::info;
                     }
                 }
@@ -582,7 +606,8 @@ int Application::configure(int argc, char ** argv)
     }
     catch (std::exception const & ex)
     {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Exception while parsing log level from command line: %s", ex.what());
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                     "Exception while parsing log level from command line: %s", ex.what());
     }
 
     try
@@ -591,7 +616,8 @@ int Application::configure(int argc, char ** argv)
     }
     catch (std::exception const & ex)
     {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Exception while configuring logging service: %s", ex.what());
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                     "Exception while configuring logging service: %s", ex.what());
         return -2;
     }
 
@@ -599,9 +625,12 @@ int Application::configure(int argc, char ** argv)
 
     Logger logger = core::getLogger();
     logger->info("Log initialized");
-    logger->info("Base path: {}", mBasePath.has_value() ? mBasePath.value().generic_string() : "none");
-    logger->info("Pref path: {}", mPrefPath.has_value() ? mPrefPath.value().generic_string() : "none");
-    logger->info("Config file: {}", mConfigFilePath.has_value() ? mConfigFilePath.value().generic_string() : "none");
+    logger->info("Base path: {}",
+                 mBasePath.has_value() ? mBasePath.value().generic_string() : "none");
+    logger->info("Pref path: {}",
+                 mPrefPath.has_value() ? mPrefPath.value().generic_string() : "none");
+    logger->info("Config file: {}",
+                 mConfigFilePath.has_value() ? mConfigFilePath.value().generic_string() : "none");
 
     int error{ -2 };
     try
@@ -611,7 +640,8 @@ int Application::configure(int argc, char ** argv)
     }
     catch (std::system_error const & ex)
     {
-        logger->error("Error while configuring application: {} (code: {})", ex.what(), ex.code().value());
+        logger->error("Error while configuring application: {} (code: {})",
+                      ex.what(), ex.code().value());
         error = ex.code().value();
     }
     catch (std::exception const & ex)
@@ -656,7 +686,8 @@ void Application::shutDown()
     }
     catch (std::system_error const & ex)
     {
-        auto errorMessage = fmt::format("Exception while onShutdown: {} (code: {})", ex.what(), ex.code().value());
+        auto errorMessage = fmt::format("Exception while onShutdown: {} (code: {})",
+                                        ex.what(), ex.code().value());
         if (logger)
         {
             logger->critical(errorMessage);
@@ -685,7 +716,8 @@ void Application::shutDown()
     }
     catch (std::system_error const & ex)
     {
-        auto errorMessage = fmt::format("Exception while shutdown: {} (code: {})", ex.what(), ex.code().value());
+        auto errorMessage = fmt::format("Exception while shutdown: {} (code: {})",
+                                        ex.what(), ex.code().value());
         if (logger)
         {
             logger->critical(errorMessage);
@@ -722,7 +754,14 @@ void Application::shutDown()
 //    path = path.parent_path();
 
 //    mBasePath = std::move(path);
+//#elif defined(PORK_PLATFORM_WINDOWS)
+//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on Windows platform");
+//#elif defined(PORK_PLATFORM_MACOS)
+//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on Mac OS X platform");
+//#elif defined(PORK_PLATFORM_ANDROID)
+//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on Android platform");
 //#endif
+//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on given platform");
 //}
 
 //void Application::findPrefPath()
@@ -754,7 +793,14 @@ void Application::shutDown()
 //    path /= mAppName;
 
 //    mPrefPath = std::move(path);
+//#elif defined(PORK_PLATFORM_WINDOWS)
+//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on Windows platform");
+//#elif defined(PORK_PLATFORM_MACOS)
+//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on Mac OS X platform");
+//#elif defined(PORK_PLATFORM_ANDROID)
+//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on Android platform");
 //#endif
+//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on given platform");
 //}
 
 } // namespace pork::base
