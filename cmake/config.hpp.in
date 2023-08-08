@@ -1,0 +1,12 @@
+#pragma once
+
+#define PORK_VERSION_MAJOR @pork_VERSION_MAJOR@
+#define PORK_VERSION_MINOR @pork_VERSION_MINOR@
+#define PORK_VERSION_PATCH @pork_VERSION_PATCH@
+
+#define PORK_BITS @pork_BITS@
+
+namespace pork
+{
+} // namespace pork
+

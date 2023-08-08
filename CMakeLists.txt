@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0077 NEW)
 cmake_policy(SET CMP0126 NEW)
 
@@ -8,7 +9,28 @@ project(pork
     VERSION 0.1.0
 )
 
-list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
+list(PREPEND CMAKE_MODULE_PATH
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pork-cmake-modules"
+    )
+message(STATUS "CMake module path: ${CMAKE_MODULE_PATH}")
+
+include("pork-build-tree-macros")
+init_host_system_vars()
+message(STATUS "pork host system: ${PORK_HOST_SYSTEM}")
+message(STATUS "pork host platform: ${PORK_HOST_PLATFORM}")
+message(STATUS "pork host bitness: ${PORK_HOST_BITNESS}")
+
+init_build_types(TYPES "Release" "Debug" "RelWithDebInfo" "MinSizeRel" DEFAULT "Release")
+if (NOT PORK_OUTPUT_PREFIX)
+  if (GENERATOR_IS_MULTI_CONFIG)
+    set(PORK_OUTPUT_PREFIX "${CMAKE_BINARY_DIR}/")
+  else()
+    set(PORK_OUTPUT_PREFIX "${CMAKE_BINARY_DIR}/")
+  endif()
+endif()
+init_output_directories(OUTPUT_PREFIX "${PORK_OUTPUT_PREFIX}")
+
 
 set(PORK_BUILD_SHARED_LIBS_DEFAULT ${BUILD_SHARED_LIBS})
 set(PORK_BUILD_UT_DEFAULT TRUE)
