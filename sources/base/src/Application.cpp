@@ -4,9 +4,9 @@
 #include <SFML/Config.hpp>
 #include <SFML/System/Err.hpp>
 #include <cassert>
-#include <SDL.h>
-#include <SDL_system.h>
-#include <SDL_log.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_system.h>
+#include <SDL3/SDL_log.h>
 #include <pork/core/Logging.hpp>
 #if defined(PORK_PLAFORM_ANDROID)
 #include <spdlog/sinks/android_sink.h>
