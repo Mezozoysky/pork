@@ -1,5 +1,4 @@
 .projectile
 CMakeLists.txt.user
-build/
 out/
 
