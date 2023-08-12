@@ -1,8 +1,6 @@
 #include "Application.hpp"
 #include <pork/core/StrUtils.hpp>
 #include <pork/core/Errors.hpp>
-#include <SFML/Config.hpp>
-#include <SFML/System/Err.hpp>
 #include <cassert>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_system.h>
