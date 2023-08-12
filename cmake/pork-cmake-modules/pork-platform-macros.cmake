@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+
+
+macro(init_host_system_vars)
+    if (NOT PORK_HOST_SYSTEM)
+        cmake_host_system_information(RESULT PORK_HOST_SYSTEM QUERY OS_NAME)
+        string(TOLOWER "${PORK_HOST_SYSTEM}" PORK_HOST_SYSTEM)
+    endif()
+    if (NOT PORK_HOST_PLATFORM)
+        cmake_host_system_information(RESULT PORK_HOST_PLATFORM QUERY OS_PLATFORM)
+        string(TOLOWER "${PORK_HOST_PLATFORM}" PORK_HOST_PLATFORM)
+    endif()
+    if (NOT PORK_HOST_BITNESS)
+        cmake_host_system_information(RESULT PORK_HOST_IS_64BIT QUERY IS_64BIT)
+        if (PORK_HOST_IS_64BIT)
+            set(PORK_HOST_BITNESS 64)
+        else()
+            set(PORK_HOST_BITNESS 32)
+        endif()
+    endif()
+
+    if((CMAKE_SCRIPT_MODE_FILE AND NOT TOOLCHAIN) OR (NOT CMAKE_SCRIPT_MODE_FILE AND NOT CMAKE_TOOLCHAIN_FILE))
+      set(PORK_SYSTEM "${PORK_HOST_SYSTEM}")
+      set(PORK_PLATFORM "${PORK_HOST_PLATFORM}")
+      set(PORK_BITNESS "${PORK_HOST_BITNESS}")
+    endif()
+endmacro()
+

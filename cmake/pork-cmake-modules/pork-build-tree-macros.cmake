@@ -4,24 +4,6 @@ include(CMakeParseArguments)
 include(GNUInstallDirs)
 
 
-macro(init_host_system_vars)
-    if (NOT PORK_HOST_SYSTEM)
-        cmake_host_system_information(RESULT PORK_HOST_SYSTEM QUERY OS_NAME)
-    endif()
-    if (NOT PORK_HOST_PLATFORM)
-        cmake_host_system_information(RESULT PORK_HOST_PLATFORM QUERY OS_PLATFORM)
-    endif()
-    if (NOT PORK_HOST_BITNESS)
-        cmake_host_system_information(RESULT PORK_HOST_IS_64BIT QUERY IS_64BIT)
-        if (PORK_HOST_IS_64BIT)
-            set(PORK_HOST_BITNESS 64)
-        else()
-            set(PORK_HOST_BITNESS 32)
-        endif()
-    endif()
-endmacro()
-
-
 macro(init_build_types)
     cmake_parse_arguments(ARGS # prefix
         "" # list of options (boolean args)

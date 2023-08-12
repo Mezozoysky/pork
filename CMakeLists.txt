@@ -15,12 +15,13 @@ list(PREPEND CMAKE_MODULE_PATH
     )
 message(STATUS "CMake module path: ${CMAKE_MODULE_PATH}")
 
-include("pork-build-tree-macros")
+include("pork-platform-macros")
 init_host_system_vars()
 message(STATUS "pork host system: ${PORK_HOST_SYSTEM}")
 message(STATUS "pork host platform: ${PORK_HOST_PLATFORM}")
 message(STATUS "pork host bitness: ${PORK_HOST_BITNESS}")
 
+include("pork-build-tree-macros")
 init_build_types(TYPES "Release" "Debug" "RelWithDebInfo" "MinSizeRel" DEFAULT "Release")
 if (NOT PORK_OUTPUT_PREFIX)
   if (GENERATOR_IS_MULTI_CONFIG)
