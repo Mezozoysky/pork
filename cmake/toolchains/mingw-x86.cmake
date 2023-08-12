@@ -3,8 +3,8 @@ string(TOLOWER "${CMAKE_SYSTEM_NAME}" PORK_SYSTEM)
 set(PORK_PLATFORM "x86")
 set(PORK_BITNESS 32)
 
-set(CMAKE_C_COMPILER   i686-w64-mingw32-gcc-win32)
-set(CMAKE_CXX_COMPILER i686-w64-wingw32-g++-win32)
+set(CMAKE_C_COMPILER   i686-w64-mingw32-gcc-posix)
+set(CMAKE_CXX_COMPILER i686-w64-mingw32-g++-posix)
 
 set(CMAKE_FIND_ROOT_PATH /usr/i686-w64-mingw32)
 
