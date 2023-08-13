@@ -22,13 +22,9 @@ message(STATUS "pork host platform: ${PORK_HOST_PLATFORM}")
 message(STATUS "pork host bitness: ${PORK_HOST_BITNESS}")
 
 include("pork-build-tree-macros")
-init_build_types(TYPES "Release" "Debug" "RelWithDebInfo" "MinSizeRel" DEFAULT "Release")
+init_build_types(AVAILABLE "Debug" "Release" "RelWithDebInfo" "MinSizeRel" DEFAULT "Debug")
 if (NOT PORK_OUTPUT_PREFIX)
-  if (GENERATOR_IS_MULTI_CONFIG)
-    set(PORK_OUTPUT_PREFIX "${CMAKE_BINARY_DIR}/")
-  else()
-    set(PORK_OUTPUT_PREFIX "${CMAKE_BINARY_DIR}/")
-  endif()
+    set(PORK_OUTPUT_PREFIX "${CMAKE_BINARY_DIR}")
 endif()
 init_output_directories(OUTPUT_PREFIX "${PORK_OUTPUT_PREFIX}")
 
@@ -48,26 +44,6 @@ option(PORK_SDL_BUNDLED "Use bundled SDL2 library for build" TRUE)
 option(PORK_FMT_BUNDLED "Use bundled fmt library for build" TRUE)
 option(PORK_SPDLOG_BUNDLED "Use bundled spdlog library for build" TRUE)
 option(PORK_PUGIXML_BUNDLED "Use bundled pugixml library for build" TRUE)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug/bin)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release/bin)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/relwithdebinfo/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/relwithdebinfo/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/relwithdebinfo/bin)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/minsizerel/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/minsizerel/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/minsizerel/bin)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<LOWER_CASE:$<CONFIG>>/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<LOWER_CASE:$<CONFIG>>/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<LOWER_CASE:$<CONFIG>>/bin)
 
 add_library(common INTERFACE)
 add_library(pork::common ALIAS common)
