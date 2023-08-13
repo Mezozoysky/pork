@@ -6,21 +6,21 @@ endif()
 
 message(STATUS "Script starting: ${CMAKE_CURRENT_LIST_FILE}")
 
-if(NOT PROJECT_TOP_DIR)
+if("${PROJECT_TOP_DIR}" STREQUAL "")
     set(PROJECT_TOP_DIR ${CMAKE_CURRENT_LIST_DIR})
     message(STATUS "PROJECT_TOP_DIR isn't set so using '${PROJECT_TOP_DIR}' as PROJECT_TOP_DIR")
 else()
     message(STATUS "PROJECT_TOP_DIR: '${PROJECT_TOP_DIR}'")
 endif()
 
-if(NOT BUILD_TOP_DIR)
+if("${BUILD_TOP_DIR}" STREQUAL "")
     set(BUILD_TOP_DIR "${PROJECT_TOP_DIR}/build")
     message(STATUS "BUILD_TOP_DIR isn't set so using '${BUILD_TOP_DIR}' as BUILD_TOP_DIR")
 else()
     message(STATUS "BUILD_TOP_DIR: '${BUILD_TOP_DIR}'")
 endif()
 
-if(NOT GENERATOR)
+if("${GENERATOR}" STREQUAL "")
     set(GENERATOR "Ninja Multi-Config")
 endif()
 message(STATUS "GENERATOR: '${GENERATOR}'")
@@ -55,7 +55,10 @@ message(STATUS "PORK_PLATFORM: '${PORK_PLATFORM}'")
 message(STATUS "PORK_BITNESS: ${PORK_BITNESS}")
 set(BUILD_PROJECT_DIR "${BUILD_TOP_DIR}/${PORK_SYSTEM}-${PORK_PLATFORM}")
 if(NOT "${BUILD_PROJECT_DIR_POSTFIX}" STREQUAL "")
-  set(BUILD_PROJECT_DIR "${BUILD_PROJECT_DIR}-${BUILD_PROJECT_DIR_POSTFIX}")
+    set(BUILD_PROJECT_DIR "${BUILD_PROJECT_DIR}-${BUILD_PROJECT_DIR_POSTFIX}")
+endif()
+if(NOT "${BUILD_PROJECT_DIR_SUBPATH}" STREQUAL "")
+    set(BUILD_PROJECT_DIR "${BUILD_PROJECT_DIR}/${BUILD_PROJECT_DIR_SUBPATH}")
 endif()
 message(STATUS "BUILD_PROJECT_DIR: '${BUILD_PROJECT_DIR}'")
 
@@ -63,6 +66,7 @@ message(STATUS "-------- Start project generation --------")
 execute_process(COMMAND "${CMAKE_COMMAND}"
                         -S "${PROJECT_TOP_DIR}"
                         -B "${BUILD_PROJECT_DIR}"
+                        -G "${GENERATOR}"
                         -D "CMAKE_TOOLCHAIN_FILE:PATH=${TOOLCHAIN_FILE}"
                         -D "CMAKE_BUILD_TYPE:STRING=${BUILD_CONFIG}"
                 )
