@@ -9,10 +9,9 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/build-script-macros.cmake)
 
 build_script_header()
-build_config_define()
 
 set(TOOLCHAIN "host")
-set(GENERATOR "Unix Makefiles")
+set(GENERATOR "Ninja Multi-Config")
 set(BUILD_PROJECT_DIR_POSTFIX "")
 
 build_script_footer()
