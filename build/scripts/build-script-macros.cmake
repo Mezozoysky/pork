@@ -14,8 +14,8 @@ macro(build_script_footer)
                             -D "TOOLCHAIN:STRING=${TOOLCHAIN}"
                             -D "GENERATOR:STRING=${GENERATOR}"
                             -D "BUILD_CONFIG:STRING=${BUILD_CONFIG}"
-                            -D "BUILD_PROJECT_DIR_POSTFIX:STRING=${BUILD_PROJECT_DIR_POSTFIX}"
-                            -D "BUILD_PROJECT_DIR_SUBPATH:STRING=${BUILD_PROJECT_DIR_SUBPATH}"
+                            -D "BUILD_PROJECT_POSTFIX:STRING=${BUILD_PROJECT_POSTFIX}"
+                            -D "BUILD_PROJECT_SUBDIR:STRING=${BUILD_PROJECT_SUBDIR}"
                             -P "${PROJECT_TOP_DIR}/cmake/scripts/make_project.cmake"
                     # COMMAND_ECHO STDOUT
                     # OUTPUT_FILE "${CMAKE_CURRENT_LIST_FILE}.configure.log"
@@ -31,5 +31,23 @@ macro(build_config_define)
         set(BUILD_CONFIG "Debug")
     endif()
     string(TOLOWER "${BUILD_CONFIG}" BUILD_CONFIG_LOWERED)
-    set(BUILD_PROJECT_DIR_SUBPATH "${BUILD_CONFIG_LOWERED}")
+    set(BUILD_PROJECT_SUBDIR "${BUILD_CONFIG_LOWERED}")
 endmacro()
+
+
+macro(build_project_postfix_define)
+    cmake_parse_arguments(ARGS
+        "" # boolean args
+        "DEFAULT" # single value args
+        "" # multi value args
+        ${ARGN}
+        )
+      if("${BUILD_PROJECT_POSTFIX}" STREQUAL "")
+        if("${ARGS_DEFAULT}" STREQUAL "")
+            set(BUILD_PROJECT_POSTFIX "")
+        else()
+            set(BUILD_PROJECT_POSTFIX "${ARGS_DEFAULT}")
+        endif()
+    endif()
+endmacro()
+

@@ -1,4 +1,4 @@
-#Usage: cmake [-DBUILD_CONFIG=<Debug|Release|RelWithDebInfo|MinSizeRel>] -P make_project-unix-make.cmake
+#Usage: cmake [-DBUILD_CONFIG=<Debug|Release|RelWithDebInfo|MinSizeRel>] -P make_project-ninja-multi.cmake
 
 cmake_minimum_required(VERSION 3.13)
 
@@ -9,9 +9,9 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/build-script-macros.cmake)
 
 build_script_header()
+build_project_postfix_define(DEFAULT "")
 
 set(TOOLCHAIN "host")
 set(GENERATOR "Ninja Multi-Config")
-set(BUILD_PROJECT_DIR_POSTFIX "")
 
 build_script_footer()
