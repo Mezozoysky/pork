@@ -37,7 +37,7 @@ endmacro()
 
 macro(init_output_directories)
     cmake_parse_arguments(ARGS # prefix
-        "NO_GNU_DIRS LOWER_DIR_NAMES" # list of options (boolean args)
+        "NO_GNU_DIRS;LOWER_DIR_NAMES" # list of options (boolean args)
         "OUTPUT_PREFIX" # list of single value args
         "" # list of multi value args
         ${ARGN}

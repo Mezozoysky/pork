@@ -27,7 +27,7 @@ init_build_types(AVAILABLE "Debug" "Release" "RelWithDebInfo" DEFAULT "Debug")
 if (NOT PORK_OUTPUT_PREFIX)
     set(PORK_OUTPUT_PREFIX "${CMAKE_BINARY_DIR}")
 endif()
-init_output_directories(OUTPUT_PREFIX "${PORK_OUTPUT_PREFIX}")
+init_output_directories(LOWER_DIR_NAMES OUTPUT_PREFIX "${PORK_OUTPUT_PREFIX}")
 
 
 set(PORK_BUILD_SHARED_LIBS_DEFAULT ${BUILD_SHARED_LIBS})
