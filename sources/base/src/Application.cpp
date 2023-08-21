@@ -633,7 +633,6 @@ int Application::configure(int argc, char ** argv)
     int error{ -2 };
     try
     {
-        error = 0;
         error = onConfigure(args, configXml);
     }
     catch (std::system_error const & ex)
