@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Context.hpp>
+#include <pork/base/Context.hpp>
 #include <vector>
 #include <string>
 #include <string_view>
@@ -36,7 +36,8 @@ public:
 
 protected:
     virtual int onConfigure(std::vector<std::string_view> const & args,
-                            pugi::xml_document const & configXml) = 0;
+                            pugi::xml_document const & configXml)
+            = 0;
     virtual int onSetUp() = 0;
     virtual int onStart() = 0;
     virtual void onShutDown() = 0;
@@ -52,8 +53,8 @@ private:
     void shutDown();
 
 private:
-//    void findBasePath();
-//    void findPrefPath();
+    //    void findBasePath();
+    //    void findPrefPath();
 
     bool mStopping;
 

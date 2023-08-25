@@ -1,4 +1,5 @@
 #include "Application.hpp"
+#include <pork/base/Config.hpp>
 #include <pork/core/StrUtils.hpp>
 #include <pork/core/Errors.hpp>
 #include <cassert>
@@ -44,7 +45,7 @@ Application::Application(std::string_view appName, std::optional<std::string_vie
 
 int Application::run(int argc, char ** argv)
 {
-    int error {0};
+    int error{0};
 
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
@@ -62,7 +63,8 @@ int Application::run(int argc, char ** argv)
         if (basePath == NULL)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                         "Failed to obtain application base path: %s", SDL_GetError());
+                         "Failed to obtain application base path: %s",
+                         SDL_GetError());
         }
         else
         {
@@ -76,7 +78,8 @@ int Application::run(int argc, char ** argv)
         if (prefPath == NULL)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                         "Failed to obtain application pref path: %s", SDL_GetError());
+                         "Failed to obtain application pref path: %s",
+                         SDL_GetError());
         }
         else
         {
@@ -100,7 +103,8 @@ int Application::run(int argc, char ** argv)
     catch (std::system_error const & ex)
     {
         auto errorMessage = fmt::format("Exception during configuring: {} (code: {})",
-                                        ex.what(), ex.code().value());
+                                        ex.what(),
+                                        ex.code().value());
         if (logger)
         {
             logger->critical(errorMessage);
@@ -147,8 +151,8 @@ int Application::run(int argc, char ** argv)
     }
     catch (std::system_error const & ex)
     {
-        auto errorMessage = fmt::format("Unhandled exception: {} (code: {})",
-                                        ex.what(), ex.code().value());
+        auto errorMessage
+                = fmt::format("Unhandled exception: {} (code: {})", ex.what(), ex.code().value());
         logger->critical(errorMessage);
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Critical error", errorMessage.data(), NULL);
         error = ex.code().value();
@@ -168,7 +172,7 @@ int Application::run(int argc, char ** argv)
 
 std::optional<fs::path> Application::findConfig()
 {
-    std::string configName{ fmt::format("{}.xml", mAppName) };
+    std::string configName{fmt::format("{}.xml", mAppName)};
 
     fs::path configPath;
 
@@ -190,7 +194,8 @@ std::optional<fs::path> Application::findConfig()
     catch (fs::filesystem_error const & ex)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                     "Error while searching for config in current directory: %s", ex.what());
+                     "Error while searching for config in current directory: %s",
+                     ex.what());
     }
 
     // checking for config in base
@@ -209,7 +214,8 @@ std::optional<fs::path> Application::findConfig()
         catch (fs::filesystem_error const & ex)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                         "Error while searching for config in base directory: %s", ex.what());
+                         "Error while searching for config in base directory: %s",
+                         ex.what());
         }
 
         // checking for base parent
@@ -230,7 +236,8 @@ std::optional<fs::path> Application::findConfig()
         catch (fs::filesystem_error const & ex)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                         "Error while searching for config in base parent directory: %s", ex.what());
+                         "Error while searching for config in base parent directory: %s",
+                         ex.what());
         }
     }
 
@@ -262,7 +269,8 @@ std::optional<fs::path> Application::findConfig()
         catch (fs::filesystem_error const & ex)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                         "Error while searching for config in pref directory: %s", ex.what());
+                         "Error while searching for config in pref directory: %s",
+                         ex.what());
         }
     }
 
@@ -271,8 +279,7 @@ std::optional<fs::path> Application::findConfig()
     {
         try
         {
-            if (fs::is_directory(mBasePath.value())
-                and mBasePath.value().has_parent_path()
+            if (fs::is_directory(mBasePath.value()) and mBasePath.value().has_parent_path()
                 and mBasePath.value().filename().string() == "bin")
             {
                 fs::path etcPath = mBasePath.value().parent_path();
@@ -303,7 +310,8 @@ std::optional<fs::path> Application::findConfig()
         catch (fs::filesystem_error const & ex)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                         "Error while searching for config in etc/ directory: %s", ex.what());
+                         "Error while searching for config in etc/ directory: %s",
+                         ex.what());
         }
     }
 
@@ -346,7 +354,8 @@ int Application::configure(int argc, char ** argv)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                          "Failed to load config file '%s': %s",
-                         mConfigFilePath.value().native().data(), result.description());
+                         mConfigFilePath.value().native().data(),
+                         result.description());
         }
         else
         {
@@ -360,7 +369,7 @@ int Application::configure(int argc, char ** argv)
     spdlog::level::level_enum level = spdlog::level::info;
     std::string pattern = "%Y-%m-%d %H:%M:%S:%e | %n | %l |: %v";
     std::vector<spdlog::sink_ptr> sinks;
-    bool multithreaded{ true };
+    bool multithreaded{true};
 
     if (configLoaded && configXml.empty())
     {
@@ -382,7 +391,7 @@ int Application::configure(int argc, char ** argv)
                 auto levelAttr = logNode.attribute("level");
                 if (!levelAttr.empty())
                 {
-                    std::string levelStr { levelAttr.as_string() };
+                    std::string levelStr{levelAttr.as_string()};
                     trim(levelStr);
                     level = spdlog::level::from_str(levelStr);
                     if (level == spdlog::level::off && levelStr != "off")
@@ -394,171 +403,195 @@ int Application::configure(int argc, char ** argv)
                     }
                 }
             }
-// 			auto * pattern_attr = log_node->first_attribute("pattern");
-// 			if (pattern_attr)
-// 			{
-// 				pattern.assign(pattern_attr->value(), pattern_attr->value_size());
-// 			}
+            // 			auto * pattern_attr = log_node->first_attribute("pattern");
+            // 			if (pattern_attr)
+            // 			{
+            // 				pattern.assign(pattern_attr->value(), pattern_attr->value_size());
+            // 			}
 
-// 			auto * mt_attr = log_node->first_attribute("multithreaded");
-// 			if (mt_attr)
-// 			{
-// 				std::string mtStr{ mt_attr->value(), mt_attr->value_size() };
-// 				stru::trim(mtStr);
-// 				if (!stru::parseBool(mtStr, multithreaded))
-// 				{
-// 					SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log config is malformed: unexpected multithreaded value: '%s'", mtStr.data());
-// 				}
-// 			}
+            // 			auto * mt_attr = log_node->first_attribute("multithreaded");
+            // 			if (mt_attr)
+            // 			{
+            // 				std::string mtStr{ mt_attr->value(), mt_attr->value_size() };
+            // 				stru::trim(mtStr);
+            // 				if (!stru::parseBool(mtStr, multithreaded))
+            // 				{
+            // 					SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log config is malformed:
+            // unexpected multithreaded value: '%s'", mtStr.data());
+            // 				}
+            // 			}
 
-// #if defined(PORK_PLATFORM_ANDROID)
-// 			multithreaded
-// 			? sinks.push_back(std::make_shared<spdlog::sinks::android_sink_mt>())
-// 			: sinks.push_back(std::make_shared<spdlog::sinks::android_sink_st>());
+            // #if defined(PORK_PLATFORM_ANDROID)
+            // 			multithreaded
+            // 			? sinks.push_back(std::make_shared<spdlog::sinks::android_sink_mt>())
+            // 			: sinks.push_back(std::make_shared<spdlog::sinks::android_sink_st>());
 
-// 			if (mPrefPath.has_value())
-// 			{
-// 				fs::path path = mPrefPath.value() / fmt::format("{}.log", mAppName);
-// 				multithreaded
-// 				? sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(path.generic_string(), true))
-// 				: sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_st>(path.generic_string(), true));
-// 			}
-// #else
-// 			auto * sinks_node = log_node->first_node("sinks");
-// 			if (sinks_node)
-// 			{
-// 				auto * sink_node = sinks_node->first_node("stdout");
+            // 			if (mPrefPath.has_value())
+            // 			{
+            // 				fs::path path = mPrefPath.value() / fmt::format("{}.log", mAppName);
+            // 				multithreaded
+            // 				?
+            // sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(path.generic_string(),
+            // true)) 				:
+            // sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_st>(path.generic_string(),
+            // true));
+            // 			}
+            // #else
+            // 			auto * sinks_node = log_node->first_node("sinks");
+            // 			if (sinks_node)
+            // 			{
+            // 				auto * sink_node = sinks_node->first_node("stdout");
 
-// 				if (sink_node)
-// 				{
-// 					bool colored{ false };
-// 					auto * color_attr = sink_node->first_attribute("color");
+            // 				if (sink_node)
+            // 				{
+            // 					bool colored{ false };
+            // 					auto * color_attr = sink_node->first_attribute("color");
 
-// 					if (color_attr)
-// 					{
-// 						std::string colorStr{ color_attr->value(), color_attr->value_size() };
+            // 					if (color_attr)
+            // 					{
+            // 						std::string colorStr{ color_attr->value(),
+            // color_attr->value_size()
+            // };
 
-// 						if (!stru::parseBool(colorStr, colored))
-// 						{
-// 							SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log/sinks/stdout config is malformed: unexpected color value: '%s'", colorStr.data());
-// 						}
-// 					}
+            // 						if (!stru::parseBool(colorStr, colored))
+            // 						{
+            // 							SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log/sinks/stdout
+            // config is malformed: unexpected color value: '%s'", colorStr.data());
+            // 						}
+            // 					}
 
-// 					if (colored)
-// 					{
-// 						multithreaded
-// 						? sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>(spdlog::color_mode::always))
-// 						: sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_st>(spdlog::color_mode::always));
-// 					}
-// 					else
-// 					{
-// 						multithreaded
-// 						? sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>())
-// 						: sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_st>());
-// 					}
-// 				}
+            // 					if (colored)
+            // 					{
+            // 						multithreaded
+            // 						?
+            // sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>(spdlog::color_mode::always))
+            // 						:
+            // sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_st>(spdlog::color_mode::always));
+            // 					}
+            // 					else
+            // 					{
+            // 						multithreaded
+            // 						?
+            // sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>()) :
+            // sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_st>());
+            // 					}
+            // 				}
 
-// 				sink_node = sinks_node->first_node("stderr");
+            // 				sink_node = sinks_node->first_node("stderr");
 
-// 				if (sink_node)
-// 				{
-// 					bool colored{ false };
-// 					auto * color_attr = sink_node->first_attribute("color");
+            // 				if (sink_node)
+            // 				{
+            // 					bool colored{ false };
+            // 					auto * color_attr = sink_node->first_attribute("color");
 
-// 					if (color_attr)
-// 					{
-// 						std::string colorStr{ color_attr->value(), color_attr->value_size() };
+            // 					if (color_attr)
+            // 					{
+            // 						std::string colorStr{ color_attr->value(),
+            // color_attr->value_size()
+            // };
 
-// 						if (!stru::parseBool(colorStr, colored))
-// 						{
-// 							SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log/sinks/stderr config is malformed: unexpected color value: '%s'", colorStr.data());
-// 						}
-// 					}
+            // 						if (!stru::parseBool(colorStr, colored))
+            // 						{
+            // 							SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log/sinks/stderr
+            // config is malformed: unexpected color value: '%s'", colorStr.data());
+            // 						}
+            // 					}
 
-// 					if (colored)
-// 					{
-// 						multithreaded
-// 						? sinks.push_back(std::make_shared<spdlog::sinks::stderr_color_sink_mt>())
-// 						: sinks.push_back(std::make_shared<spdlog::sinks::stderr_color_sink_st>());
-// 					}
-// 					else
-// 					{
-// 						multithreaded
-// 						? sinks.push_back(std::make_shared<spdlog::sinks::stderr_sink_mt>())
-// 						: sinks.push_back(std::make_shared<spdlog::sinks::stderr_sink_st>());
-// 					}
-// 				}
+            // 					if (colored)
+            // 					{
+            // 						multithreaded
+            // 						?
+            // sinks.push_back(std::make_shared<spdlog::sinks::stderr_color_sink_mt>())
+            // : sinks.push_back(std::make_shared<spdlog::sinks::stderr_color_sink_st>());
+            // 					}
+            // 					else
+            // 					{
+            // 						multithreaded
+            // 						?
+            // sinks.push_back(std::make_shared<spdlog::sinks::stderr_sink_mt>()) :
+            // sinks.push_back(std::make_shared<spdlog::sinks::stderr_sink_st>());
+            // 					}
+            // 				}
 
-// 				sink_node = sinks_node->first_node("file");
+            // 				sink_node = sinks_node->first_node("file");
 
-// 				if (sink_node)
-// 				{
-// 					std::string fileName{ fmt::format("{}.log", mAppName) };
-// 					auto * name_attr = sink_node->first_attribute("name");
+            // 				if (sink_node)
+            // 				{
+            // 					std::string fileName{ fmt::format("{}.log", mAppName) };
+            // 					auto * name_attr = sink_node->first_attribute("name");
 
-// 					if (name_attr)
-// 					{
-// 						std::string name{ name_attr->value(), name_attr->value_size() };
-// 						stru::trim(name);
+            // 					if (name_attr)
+            // 					{
+            // 						std::string name{ name_attr->value(), name_attr->value_size() };
+            // 						stru::trim(name);
 
-// 						if (name.empty())
-// 						{
-// 							SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log/sinks/file config is malformed: name is empty");
-// 						}
-// 						else
-// 						{
-// 							fileName = name;
-// 						}
-// 					}
+            // 						if (name.empty())
+            // 						{
+            // 							SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log/sinks/file
+            // config is malformed: name is empty");
+            // 						}
+            // 						else
+            // 						{
+            // 							fileName = name;
+            // 						}
+            // 					}
 
-// 					bool truncate{ true };
-// 					auto * truncate_attr = sink_node->first_attribute("truncate");
+            // 					bool truncate{ true };
+            // 					auto * truncate_attr = sink_node->first_attribute("truncate");
 
-// 					if (truncate_attr)
-// 					{
-// 						std::string truncateStr{ truncate_attr->value(), truncate_attr->value_size() };
+            // 					if (truncate_attr)
+            // 					{
+            // 						std::string truncateStr{ truncate_attr->value(),
+            // truncate_attr->value_size()
+            // };
 
-// 						if (!stru::parseBool(truncateStr, truncate))
-// 						{
-// 							SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log/sinks/file config is malformed: unexpected color value: '%s'", truncateStr.data());
-// 						}
-// 					}
+            // 						if (!stru::parseBool(truncateStr, truncate))
+            // 						{
+            // 							SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Log/sinks/file
+            // config is malformed: unexpected color value: '%s'", truncateStr.data());
+            // 						}
+            // 					}
 
-// 					fs::path filePath{ fileName };
+            // 					fs::path filePath{ fileName };
 
-// 					if (filePath.is_relative())
-// 					{
-// 						if (mPrefPath.has_value())
-// 						{
-// 							filePath = mPrefPath.value() / filePath;
-// 							filePath = filePath.lexically_normal();
-// 						}
-// 						else if (mBasePath.has_value())
-// 						{
-// 							if (fs::is_directory(mBasePath.value()) and mBasePath.value().has_parent_path() and mBasePath.value().filename().string() == "bin")
-// 							{
-// 								filePath = mBasePath.value().parent_path() / filePath;
-// 							}
-// 							else
-// 							{
-// 								filePath = mBasePath.value() / filePath;
-// 							}
-// 						}
-// 						else
-// 						{
-// 							filePath = fs::current_path() / filePath;
-// 						}
-// 					}
+            // 					if (filePath.is_relative())
+            // 					{
+            // 						if (mPrefPath.has_value())
+            // 						{
+            // 							filePath = mPrefPath.value() / filePath;
+            // 							filePath = filePath.lexically_normal();
+            // 						}
+            // 						else if (mBasePath.has_value())
+            // 						{
+            // 							if (fs::is_directory(mBasePath.value()) and
+            // mBasePath.value().has_parent_path() and mBasePath.value().filename().string() ==
+            // "bin")
+            // 							{
+            // 								filePath = mBasePath.value().parent_path() / filePath;
+            // 							}
+            // 							else
+            // 							{
+            // 								filePath = mBasePath.value() / filePath;
+            // 							}
+            // 						}
+            // 						else
+            // 						{
+            // 							filePath = fs::current_path() / filePath;
+            // 						}
+            // 					}
 
-// 					multithreaded
-// 					? sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath.generic_string(), truncate))
-// 					: sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_st>(filePath.generic_string(), truncate));
-// 				}
-// 			}
-// #endif
-// 		}
+            // 					multithreaded
+            // 					?
+            // sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath.generic_string(),
+            // truncate)) 					:
+            // sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_st>(filePath.generic_string(),
+            // truncate));
+            // 				}
+            // 			}
+            // #endif
+            // 		}
         } // rootNode
-    } // configXml
+    }     // configXml
 #if not defined(PORK_PLATFORM_ANDROID)
     if (sinks.empty())
     {
@@ -567,25 +600,25 @@ int Application::configure(int argc, char ** argv)
         {
             logPath = mPrefPath.value();
         }
-    #if defined(PORK_PLATFORM_WINDOWS)
+#if defined(PORK_PLATFORM_WINDOWS)
         else if (mBasePath.has_value())
         {
             logPath = mBasePath.value();
         }
-    #endif
+#endif
         else
         {
             logPath = fs::current_path();
         }
         logPath /= fmt::format("{}.log", mAppName);
-        multithreaded
-            ? sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath.generic_string(), true))
-            : sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_st>(logPath.generic_string(), true));
+        multithreaded ? sinks.push_back(
+                std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath.generic_string(), true))
+                      : sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_st>(
+                              logPath.generic_string(), true));
 #if not defined(PORK_PLATFORM_WINDOWS)
-        multithreaded
-                ? sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>())
-                : sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_st>());
-    #endif
+        multithreaded ? sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>())
+                      : sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_st>());
+#endif
     }
 #endif
 
@@ -595,7 +628,7 @@ int Application::configure(int argc, char ** argv)
         {
             if (args[idx] == "--log-level"sv and idx < args.size() - 1u)
             {
-                std::string levelStr{ args[idx + 1] };
+                std::string levelStr{args[idx + 1]};
                 trim(levelStr);
                 toLowerIn(levelStr);
                 level = spdlog::level::from_str(levelStr);
@@ -605,7 +638,8 @@ int Application::configure(int argc, char ** argv)
     catch (std::exception const & ex)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                     "Exception while parsing log level from command line: %s", ex.what());
+                     "Exception while parsing log level from command line: %s",
+                     ex.what());
     }
 
     try
@@ -615,7 +649,8 @@ int Application::configure(int argc, char ** argv)
     catch (std::exception const & ex)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                     "Exception while configuring logging service: %s", ex.what());
+                     "Exception while configuring logging service: %s",
+                     ex.what());
         return -2;
     }
 
@@ -630,7 +665,7 @@ int Application::configure(int argc, char ** argv)
     logger->info("Config file: {}",
                  mConfigFilePath.has_value() ? mConfigFilePath.value().generic_string() : "none");
 
-    int error{ -2 };
+    int error{-2};
     try
     {
         error = onConfigure(args, configXml);
@@ -638,7 +673,8 @@ int Application::configure(int argc, char ** argv)
     catch (std::system_error const & ex)
     {
         logger->error("Error while configuring application: {} (code: {})",
-                      ex.what(), ex.code().value());
+                      ex.what(),
+                      ex.code().value());
         error = ex.code().value();
     }
     catch (std::exception const & ex)
@@ -651,9 +687,9 @@ int Application::configure(int argc, char ** argv)
 
 int Application::setUp()
 {
-    int error {0};
+    int error{0};
 
-    if (! error)
+    if (!error)
     {
         error = onSetUp();
     }
@@ -663,7 +699,7 @@ int Application::setUp()
 
 int Application::start()
 {
-    int error{ 0 };
+    int error{0};
 
     if (!error)
     {
@@ -684,7 +720,8 @@ void Application::shutDown()
     catch (std::system_error const & ex)
     {
         auto errorMessage = fmt::format("Exception while onShutdown: {} (code: {})",
-                                        ex.what(), ex.code().value());
+                                        ex.what(),
+                                        ex.code().value());
         if (logger)
         {
             logger->critical(errorMessage);
@@ -709,12 +746,13 @@ void Application::shutDown()
 
     try
     {
-        //TODO: base::Application-level shutdown
+        // TODO: base::Application-level shutdown
     }
     catch (std::system_error const & ex)
     {
         auto errorMessage = fmt::format("Exception while shutdown: {} (code: {})",
-                                        ex.what(), ex.code().value());
+                                        ex.what(),
+                                        ex.code().value());
         if (logger)
         {
             logger->critical(errorMessage);
@@ -738,7 +776,7 @@ void Application::shutDown()
     }
 }
 
-//void Application::findBasePath()
+// void Application::findBasePath()
 //{
 //#if defined(PORK_PLATFORM_LINUX)
 //    char exePathStr[PATH_MAX];
@@ -752,16 +790,20 @@ void Application::shutDown()
 
 //    mBasePath = std::move(path);
 //#elif defined(PORK_PLATFORM_WINDOWS)
-//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on Windows platform");
+//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on
+//    Windows platform");
 //#elif defined(PORK_PLATFORM_MACOS)
-//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on Mac OS X platform");
+//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on
+//    Mac OS X platform");
 //#elif defined(PORK_PLATFORM_ANDROID)
-//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on Android platform");
+//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on
+//    Android platform");
 //#endif
-//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on given platform");
+//    throw core::NotImplementedError("pork::base::Application::findBasePath isn't implemented on
+//    given platform");
 //}
 
-//void Application::findPrefPath()
+// void Application::findPrefPath()
 //{
 //#if defined(PORK_PLATFORM_LINUX)
 //    fs::path path;
@@ -791,13 +833,17 @@ void Application::shutDown()
 
 //    mPrefPath = std::move(path);
 //#elif defined(PORK_PLATFORM_WINDOWS)
-//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on Windows platform");
+//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on
+//    Windows platform");
 //#elif defined(PORK_PLATFORM_MACOS)
-//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on Mac OS X platform");
+//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on
+//    Mac OS X platform");
 //#elif defined(PORK_PLATFORM_ANDROID)
-//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on Android platform");
+//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on
+//    Android platform");
 //#endif
-//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on given platform");
+//    throw core::NotImplementedError("pork::base::Application::findPrefPath isn't implemented on
+//    given platform");
 //}
 
 } // namespace pork::base

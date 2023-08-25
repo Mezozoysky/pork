@@ -1,13 +1,13 @@
 set(HEADER_FILES
-    Service.hpp
-    Context.hpp
-    Application.hpp
+    pork/base/Service.hpp
+    pork/base/Context.hpp
+    pork/base/Application.hpp
     )
 
 set(SOURCE_FILES
-    Service.cpp
-    Context.cpp
-    Application.cpp
+    pork/base/Service.cpp
+    pork/base/Context.cpp
+    pork/base/Application.cpp
     )
 
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}"

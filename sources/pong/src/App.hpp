@@ -1,5 +1,5 @@
-#include <Context.hpp>
-#include <Application.hpp>
+#include <pork/base/Context.hpp>
+#include <pork/base/Application.hpp>
 #include <string_view>
 #include <SDL3/SDL.h>
 #include "Ball.hpp"
@@ -12,21 +12,20 @@ using namespace std::literals;
 namespace pong
 {
 
-class App
-: public pork::base::Application
+class App : public pork::base::Application
 {
 public:
     App();
     virtual ~App();
 
-    int onConfigure(std::vector<std::string_view> const & args, pugi::xml_document const & configXml) override;
+    int onConfigure(std::vector<std::string_view> const & args,
+                    pugi::xml_document const & configXml) override;
     int onSetUp() override;
     int onStart() override;
     void onShutDown() override;
     void iterate() override;
 
 private:
-
     void handleInput();
     void updateBall();
     void updateCollisions();
