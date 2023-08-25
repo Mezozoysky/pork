@@ -321,6 +321,9 @@ std::optional<fs::path> Application::findConfig()
 
 int Application::configure(int argc, char ** argv)
 {
+    auto * config = context().addService<Config>();
+    config->setValue("app.config-path", ""s);
+
     std::vector<std::string_view> args;
     for (int idx = 0; idx < argc; ++idx)
     {
@@ -363,6 +366,8 @@ int Application::configure(int argc, char ** argv)
             std::ostringstream ss;
             configXml.save(ss, "  ");
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Config loaded:\n%s", ss.str().data());
+
+            config->setValue("app.config-path", std::move(mConfigFilePath.value()));
         }
     }
 
