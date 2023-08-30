@@ -1,5 +1,4 @@
 #include "Application.hpp"
-#include <pork/base/Config.hpp>
 #include <pork/core/StrUtils.hpp>
 #include <pork/core/Errors.hpp>
 #include <cassert>
@@ -7,7 +6,7 @@
 #include <SDL3/SDL_system.h>
 #include <SDL3/SDL_log.h>
 #include <pork/core/Logging.hpp>
-#if defined(PORK_PLAFORM_ANDROID)
+#if defined(PORK_SYSTEM_ANDROID)
 #include <spdlog/sinks/android_sink.h>
 #else
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -16,16 +15,6 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <pugixml.hpp>
 
-//#if defined(PORK_PLATFORM_LINUX)
-////#include <limits.h>
-////#include <libgen.h>
-////#include <unistd.h>
-//#if defined(__sun)
-//#define SELF_EXECUTABLE "/proc/self/path/a.out"
-//#else
-//#define SELF_EXECUTABLE "/proc/self/exe"
-//#endif
-//#endif
 
 namespace fs = std::filesystem;
 using namespace std::literals;
@@ -36,11 +25,11 @@ using pork::core::Logger;
 namespace pork::base
 {
 
-Application::Application(std::string_view appName, std::optional<std::string_view> orgName)
+Application::Application(std::string && appName, std::string && orgName)
 : mStopping{false}
-, mAppName{appName}
-, mOrgName{orgName}
 {
+    context().values.set("app.name", std::move(appName), ValueStore::Access::READ_ONLY);
+    context().values.set("app.org", std::move(orgName), ValueStore::Access::READ_ONLY);
 }
 
 int Application::run(int argc, char ** argv)
@@ -53,7 +42,7 @@ int Application::run(int argc, char ** argv)
     {
         auto errorMessage = fmt::format("Failed to initialize SDL core: {}", SDL_GetError());
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, errorMessage.data());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ctitical error", errorMessage.data(), NULL);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Critical error", errorMessage.data(), NULL);
         error = -1;
     }
 
@@ -73,8 +62,8 @@ int Application::run(int argc, char ** argv)
         }
 #endif
 
-        char * prefPath = SDL_GetPrefPath(mOrgName.has_value() ? mOrgName->data() : "",
-                                          mAppName.data());
+        char * prefPath = SDL_GetPrefPath(context().values.get<std::string>("app.org")->data(),
+                                          context().values.get<std::string>("app.name")->data());
         if (prefPath == NULL)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
@@ -172,7 +161,9 @@ int Application::run(int argc, char ** argv)
 
 std::optional<fs::path> Application::findConfig()
 {
-    std::string configName{fmt::format("{}.xml", mAppName)};
+    std::string appName;
+    context().values.get("app.name", appName);
+    std::string configName{fmt::format("{}.xml", appName)};
 
     fs::path configPath;
 
@@ -297,7 +288,7 @@ std::optional<fs::path> Application::findConfig()
 
                 // checking for etc/<AppName>/config.xml
                 configPath = etcPath;
-                configPath.append(mAppName);
+                configPath.append(appName);
                 configPath.append("config.xml");
 
                 if (fs::exists(configPath)
@@ -321,8 +312,7 @@ std::optional<fs::path> Application::findConfig()
 
 int Application::configure(int argc, char ** argv)
 {
-    auto * config = context().addService<Config>();
-    config->setValue("app.config-path", ""s);
+    context().values.set("app.config-path", ""s);
 
     std::vector<std::string_view> args;
     for (int idx = 0; idx < argc; ++idx)
@@ -367,7 +357,7 @@ int Application::configure(int argc, char ** argv)
             configXml.save(ss, "  ");
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Config loaded:\n%s", ss.str().data());
 
-            config->setValue("app.config-path", std::move(mConfigFilePath.value()));
+            context().values.set("app.config-path", std::move(mConfigFilePath.value()));
         }
     }
 
@@ -615,7 +605,7 @@ int Application::configure(int argc, char ** argv)
         {
             logPath = fs::current_path();
         }
-        logPath /= fmt::format("{}.log", mAppName);
+        logPath /= fmt::format("{}.log", *(context().values.get<std::string>("app.name")));
         multithreaded ? sinks.push_back(
                 std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath.generic_string(), true))
                       : sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_st>(

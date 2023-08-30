@@ -3,13 +3,16 @@
 
 
 App::App()
-: pork::base::Application("PorkDemo"sv, "PorkDynamics"sv)
-{}
+: pork::base::Application("Demo"s, "PorkDynamics"s)
+{
+}
 
 App::~App()
-{}
+{
+}
 
-int App::onConfigure(std::vector<std::string_view> const & args, pugi::xml_document const & configXml)
+int App::onConfigure(std::vector<std::string_view> const & args,
+                     pugi::xml_document const & configXml)
 {
     return 0;
 }
@@ -25,7 +28,8 @@ int App::onStart()
 }
 
 void App::onShutDown()
-{}
+{
+}
 
 void App::iterate()
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Service.hpp"
+#include "ValueStore.hpp"
 #include <unordered_map>
 #include <typeindex>
 #include <stdexcept>
@@ -24,9 +25,11 @@ public:
         std::type_index index{typeid(ServiceT)};
         if (mServices.find(index) != mServices.end())
         {
-            throw std::runtime_error{std::string{"Failed to add service: "} + index.name() + " already exists"};
+            throw std::runtime_error{std::string{"Failed to add service: "} + index.name()
+                                     + " already exists"};
         }
-        return static_cast<ServiceT *>(addService(std::move(index), ServiceT::makePtr(std::forward<ArgsT>(args...)...)));
+        return static_cast<ServiceT *>(
+                addService(std::move(index), ServiceT::makePtr(std::forward<ArgsT>(args...)...)));
     }
     template<typename ServiceT>
     ServiceT * addService(typename ServiceT::Ptr && ptr)
@@ -34,7 +37,8 @@ public:
         std::type_index index{typeid(ServiceT)};
         if (mServices.find(index) != mServices.end())
         {
-            throw std::runtime_error{std::string{"Failed to add service: "} + index.name() + " already exists"};
+            throw std::runtime_error{std::string{"Failed to add service: "} + index.name()
+                                     + " already exists"};
         }
         return static_cast<ServiceT *>(addService(std::move(index), std::move(ptr)));
     }
@@ -55,6 +59,9 @@ private:
     AbstractService * addService(std::type_index && index, AbstractService::Ptr && service);
     void removeService(std::type_index && index);
     AbstractService * service(std::type_index && index) const;
+
+public:
+    ValueStore values;
 
 private:
     TypeMap mServices;
@@ -85,4 +92,3 @@ inline Context & Contextual::context() const
 }
 
 } // namspace pork::base
-
