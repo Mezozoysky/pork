@@ -27,9 +27,6 @@ public:
     void stop();
     bool isStopping() const noexcept;
 
-    std::optional<std::filesystem::path> getBasePath() const noexcept;
-    std::optional<std::filesystem::path> getPrefPath() const noexcept;
-
     Context & context() noexcept;
 
 protected:
@@ -42,7 +39,7 @@ protected:
 
     virtual void iterate() = 0;
 
-    virtual std::optional<std::filesystem::path> findConfig();
+    virtual std::filesystem::path findConfig();
 
 private:
     int configure(int argc, char ** argv);
@@ -51,16 +48,8 @@ private:
     void shutDown();
 
 private:
-    //    void findBasePath();
-    //    void findPrefPath();
-
-    bool mStopping;
-
-    std::optional<std::filesystem::path> mBasePath;
-    std::optional<std::filesystem::path> mPrefPath;
-    std::optional<std::filesystem::path> mConfigFilePath;
-
     Context mContext;
+    bool mStopping;
 };
 
 inline void Application::stop()
@@ -71,16 +60,6 @@ inline void Application::stop()
 inline bool Application::isStopping() const noexcept
 {
     return mStopping;
-}
-
-inline std::optional<std::filesystem::path> Application::getBasePath() const noexcept
-{
-    return mBasePath;
-}
-
-inline std::optional<std::filesystem::path> Application::getPrefPath() const noexcept
-{
-    return mPrefPath;
 }
 
 inline Context & Application::context() noexcept

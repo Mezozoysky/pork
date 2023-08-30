@@ -7,13 +7,16 @@ namespace pong
 {
 
 App::App()
-: pork::base::Application("PorkDemo"sv, "PorkDynamics"sv)
-{}
+: pork::base::Application("Pong"s, "PorkDynamics"s)
+{
+}
 
 App::~App()
-{}
+{
+}
 
-int App::onConfigure(std::vector<std::string_view> const & args, pugi::xml_document const & configXml)
+int App::onConfigure(std::vector<std::string_view> const & args,
+                     pugi::xml_document const & configXml)
 {
     return 0;
 }
@@ -22,8 +25,7 @@ int App::onSetUp()
 {
     SDL_InitSubSystem(SDL_INIT_VIDEO);
 
-    mWindow = SDL_CreateWindow("PORK PONG",
-                               800, 600, SDL_WINDOW_INPUT_FOCUS);
+    mWindow = SDL_CreateWindow("PORK PONG", 800, 600, SDL_WINDOW_INPUT_FOCUS);
 
     if (!mWindow)
     {
@@ -123,17 +125,15 @@ void App::collideBallWithField()
 
 bool App::isCollidingBallWithPaddle(Paddle const & paddle)
 {
-    if (mBall.getX() + mBall.getWidth() > paddle.x
-        and mBall.getX() < paddle.x + paddle.width
-        and mBall.getY() + mBall.getHeight() > paddle.y
-        and mBall.getY() < paddle.y + paddle.height)
+    if (mBall.getX() + mBall.getWidth() > paddle.x and mBall.getX() < paddle.x + paddle.width
+        and mBall.getY() + mBall.getHeight() > paddle.y and mBall.getY() < paddle.y + paddle.height)
     {
         return true;
     }
     return false;
 }
 
-float App::calcPaddleReflection(const Paddle &paddle, float hitY)
+float App::calcPaddleReflection(const Paddle & paddle, float hitY)
 {
     if (hitY < 0.f)
     {
@@ -155,18 +155,15 @@ void App::collideBallWithPaddle()
 
     if (isCollidingBallWithPaddle(mPaddleLeft))
     {
-        mBall.setPosition(mPaddleLeft.x + mPaddleLeft.width,
-                          mBall.getY());
+        mBall.setPosition(mPaddleLeft.x + mPaddleLeft.width, mBall.getY());
         mBall.setDirection(1, calcPaddleReflection(mPaddleLeft, ballCenterY - mPaddleLeft.y));
     }
 
     if (isCollidingBallWithPaddle(mPaddleRight))
     {
-        mBall.setPosition(mPaddleRight.x - mBall.getWidth(),
-                          mBall.getY());
+        mBall.setPosition(mPaddleRight.x - mBall.getWidth(), mBall.getY());
         mBall.setDirection(-1, calcPaddleReflection(mPaddleRight, ballCenterY - mPaddleRight.y));
     }
 }
 
 } // namespace pong
-

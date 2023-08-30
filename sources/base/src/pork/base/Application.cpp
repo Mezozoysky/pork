@@ -47,9 +47,10 @@ int Application::run(int argc, char ** argv)
     }
 
     {
+        fs::path basePath;
 #if not defined(PORK_PLATFORM_ANDROID)
-        char * basePath = SDL_GetBasePath();
-        if (basePath == NULL)
+        char * basePathChars = SDL_GetBasePath();
+        if (basePathChars == NULL)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                          "Failed to obtain application base path: %s",
@@ -57,14 +58,18 @@ int Application::run(int argc, char ** argv)
         }
         else
         {
-            mBasePath = basePath;
-            SDL_free(basePath);
+            basePath = basePathChars;
+            SDL_free(basePathChars);
         }
 #endif
-
-        char * prefPath = SDL_GetPrefPath(context().values.get<std::string>("app.org")->data(),
-                                          context().values.get<std::string>("app.name")->data());
-        if (prefPath == NULL)
+        context().values.set("app.paths.base", std::move(basePath), ValueStore::Access::READ_ONLY);
+    }
+    {
+        fs::path prefPath;
+        char * prefPathChars
+                = SDL_GetPrefPath(context().values.get<std::string>("app.org")->data(),
+                                  context().values.get<std::string>("app.name")->data());
+        if (prefPathChars == NULL)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                          "Failed to obtain application pref path: %s",
@@ -72,9 +77,10 @@ int Application::run(int argc, char ** argv)
         }
         else
         {
-            mPrefPath = prefPath;
-            SDL_free(prefPath);
+            prefPath = prefPathChars;
+            SDL_free(prefPathChars);
         }
+        context().values.set("app.paths.pref", std::move(prefPath), ValueStore::Access::READ_ONLY);
     }
 
     Logger logger;
@@ -159,7 +165,7 @@ int Application::run(int argc, char ** argv)
     return error;
 }
 
-std::optional<fs::path> Application::findConfig()
+fs::path Application::findConfig()
 {
     std::string appName;
     context().values.get("app.name", appName);
@@ -190,11 +196,11 @@ std::optional<fs::path> Application::findConfig()
     }
 
     // checking for config in base
-    if (mBasePath.has_value())
+    if (auto const * basePath = context().values.get<fs::path>("app.paths.base"))
     {
         try
         {
-            configPath = mBasePath.value();
+            configPath = *basePath;
             configPath.append(configName);
             if (fs::exists(configPath)
                 and (fs::is_regular_file(configPath) or (fs::is_symlink(configPath))))
@@ -212,8 +218,8 @@ std::optional<fs::path> Application::findConfig()
         // checking for base parent
         try
         {
-            configPath = mBasePath.value().parent_path();
-            if (configPath != mBasePath.value())
+            configPath = basePath->parent_path();
+            if (configPath != *basePath)
             {
                 configPath.append(configName);
 
@@ -233,12 +239,12 @@ std::optional<fs::path> Application::findConfig()
     }
 
     // checking for config in pref
-    if (mPrefPath.has_value())
+    if (auto const * prefPath = context().values.get<fs::path>("app.paths.pref"))
     {
         try
         {
             // checking for <AppName>.xml
-            configPath = mPrefPath.value();
+            configPath = *prefPath;
             configPath.append(configName);
 
             if (fs::exists(configPath)
@@ -248,7 +254,7 @@ std::optional<fs::path> Application::findConfig()
             }
 
             // checking for config.xml
-            configPath = mPrefPath.value();
+            configPath = *prefPath;
             configPath.append("config.xml");
 
             if (fs::exists(configPath)
@@ -266,14 +272,14 @@ std::optional<fs::path> Application::findConfig()
     }
 
     // checking for config in etc
-    if (mBasePath.has_value())
+    if (auto const * basePath = context().values.get<fs::path>("app.paths.base"))
     {
         try
         {
-            if (fs::is_directory(mBasePath.value()) and mBasePath.value().has_parent_path()
-                and mBasePath.value().filename().string() == "bin")
+            if (fs::is_directory(*basePath) and basePath->has_parent_path()
+                and basePath->filename().string() == "bin")
             {
-                fs::path etcPath = mBasePath.value().parent_path();
+                fs::path etcPath = basePath->parent_path();
                 etcPath.append("etc");
 
                 // checking for etc/<AppName>.xml
@@ -307,47 +313,46 @@ std::optional<fs::path> Application::findConfig()
     }
 
     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Config file isnt found");
-    return std::nullopt;
+    return fs::path{};
 }
 
 int Application::configure(int argc, char ** argv)
 {
-    context().values.set("app.config-path", ""s);
-
     std::vector<std::string_view> args;
     for (int idx = 0; idx < argc; ++idx)
     {
         args.emplace_back(argv[idx]);
     }
 
+    fs::path configFilePath;
 #if defined(PORK_PLATFORM_ANDROID)
-    mConfigFilePath = fmt::format("{}.xml", mAppName);
+    configFilePath = fmt::format("{}.xml", *context().values.get("app.name"));
 #else
     for (std::size_t idx = 0u; idx < args.size(); ++idx)
     {
         if (args[idx] == "--config"sv and idx < args.size() - 1u)
         {
-            mConfigFilePath = {args[++idx]};
+            configFilePath = {args[++idx]};
             break;
         }
     }
 
-    if (!mConfigFilePath.has_value())
+    if (!configFilePath.empty())
     {
-        mConfigFilePath = findConfig();
+        configFilePath = findConfig();
     }
 #endif
 
     pugi::xml_document configXml;
     bool configLoaded{false};
-    if (mConfigFilePath.has_value())
+    if (!configFilePath.empty())
     {
-        auto result = configXml.load_file(mConfigFilePath.value().native().c_str());
+        auto result = configXml.load_file(configFilePath.native().c_str());
         if (result.status != pugi::xml_parse_status::status_ok)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                          "Failed to load config file '%s': %s",
-                         mConfigFilePath.value().native().data(),
+                         configFilePath.native().data(),
                          result.description());
         }
         else
@@ -356,8 +361,6 @@ int Application::configure(int argc, char ** argv)
             std::ostringstream ss;
             configXml.save(ss, "  ");
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Config loaded:\n%s", ss.str().data());
-
-            context().values.set("app.config-path", std::move(mConfigFilePath.value()));
         }
     }
 
@@ -365,6 +368,11 @@ int Application::configure(int argc, char ** argv)
     std::string pattern = "%Y-%m-%d %H:%M:%S:%e | %n | %l |: %v";
     std::vector<spdlog::sink_ptr> sinks;
     bool multithreaded{true};
+
+    fs::path basePath;
+    context().values.get("app.paths.base", basePath);
+    fs::path prefPath;
+    context().values.get("app.paths.pref", prefPath);
 
     if (configLoaded && configXml.empty())
     {
@@ -591,14 +599,14 @@ int Application::configure(int argc, char ** argv)
     if (sinks.empty())
     {
         fs::path logPath;
-        if (mPrefPath.has_value())
+        if (!prefPath.empty())
         {
-            logPath = mPrefPath.value();
+            logPath = prefPath;
         }
 #if defined(PORK_PLATFORM_WINDOWS)
-        else if (mBasePath.has_value())
+        else if (!basePath.empty())
         {
-            logPath = mBasePath.value();
+            logPath = basePath;
         }
 #endif
         else
@@ -653,12 +661,13 @@ int Application::configure(int argc, char ** argv)
 
     Logger logger = core::getLogger();
     logger->info("Log initialized");
-    logger->info("Base path: {}",
-                 mBasePath.has_value() ? mBasePath.value().generic_string() : "none");
-    logger->info("Pref path: {}",
-                 mPrefPath.has_value() ? mPrefPath.value().generic_string() : "none");
+    logger->info("Base path: {}", !basePath.empty() ? basePath.generic_string() : "none");
+    logger->info("Pref path: {}", !prefPath.empty() ? prefPath.generic_string() : "none");
     logger->info("Config file: {}",
-                 mConfigFilePath.has_value() ? mConfigFilePath.value().generic_string() : "none");
+                 !configFilePath.empty() ? configFilePath.generic_string() : "none");
+
+    context().values.set("app.paths.config", std::move(configFilePath));
+
 
     int error{-2};
     try
